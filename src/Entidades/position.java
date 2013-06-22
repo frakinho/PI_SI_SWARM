@@ -44,6 +44,9 @@ public class position implements Observer {
 		particle casa = new particle(config.getWidth() / 2, config.getHeigth() / 2, 1);
 
 		this.addPoint(casa);
+		double intervalo = config.getNrParticle() / 100;
+		System.out.println("Intervalo: " + intervalo + " config: " + config.getNrParticle());
+		int k = 0;
 		while (i < config.getNrParticle()) {
 			int particleX = r.nextInt(config.getWidth());
 			int particleY = r.nextInt(config.getHeigth());
@@ -53,7 +56,13 @@ public class position implements Observer {
 
 			if (this.addPoint(particula)) {
 				this.bd.addParticle(particula);
+				if(i % intervalo == 0) {
+					k++;
+				}
+				this.config.getProgress().setParticleProgress(k);
+				this.config.getProgress().getLabelParticle().setText("<html><b>Part’culas:</b> " + k + " % conclu’do</html>");
 				i++;
+				
 			}
 		}
 		// Procura quem tem conhecimento das flroes, ou seja queme sta proximo
@@ -64,21 +73,46 @@ public class position implements Observer {
 	// metodo para distribuir o nr de flores pelo cenario
 	// Com base no nr de flores
 	public void distrFlowers() {
-		int dist = 200;
+		int dist = 180;
 		int passo = 360 / this.config.getNrFlowers();
-		double passoRad = ((2 * Math.PI * passo) / 360);
 
 		this.flowers = new ArrayList<flower>();
-		System.out.println("#######################################");
 		for (int i = 0; i < this.config.getNrFlowers(); i++) {
 			double ang = toNormalAngle(i * passo);
 
 			double x = dist * Math.cos(Math.toRadians(ang)) + (this.config.getWidth() / 2);
 			double y = dist * Math.sin(Math.toRadians(ang)) + (this.config.getHeigth() / 2);
-			System.out.println("Passo: " + ang + " Flower: " + i + " X: " + (int) x + " Y: " + (int) y);
 			this.flowers.add(new flower(i, (int) x, (int) y));
 		}
 
+	}
+
+	public Acelerometro getAcel() {
+		return acel;
+	}
+
+	public void setAcel(Acelerometro acel) {
+		this.acel = acel;
+	}
+
+	public Connect getBd() {
+		return bd;
+	}
+
+	public void setBd(Connect bd) {
+		this.bd = bd;
+	}
+
+	public config getConfig() {
+		return config;
+	}
+
+	public void setConfig(config config) {
+		this.config = config;
+	}
+
+	public void setFlowers(ArrayList<flower> flowers) {
+		this.flowers = flowers;
 	}
 
 	public double toNormalAngle(double a) {
@@ -94,34 +128,36 @@ public class position implements Observer {
 
 	// Faz o movimento
 	public void moviment() {
+		// Tenho que ver pork Ž que este metodo esta aqui
 		this.findFlower();
-		if (this.array.size() == 0) {
+		// Distribui as flores
+		this.distrFlowers();
+		if (this.array.size() != 0) {
 
-		} else {
 			for (particle par : this.array) {
 				if (par.getType() == 0) { // So faz o movimento para as outras
 											// noa para o casa
 					// Cria uma particula com a posi‹o futura para calcular
 					// sobreposi›es
-					movTabuleiro mov = this.config.getValores(par.getX(), par.getY(),par.getLocate());
+					par.setFlower(this.flowers);
+
+					movTabuleiro mov = this.config.getValores(par);
 					particle nova;
+					Point2D.Double adjust = this.adjustDirection(par,mov);
+
 					// Nao faz nada caso nao exista movimento
 					if (mov != null) {
 						try {
 							int andaX = ((int) mov.getX());
 							int andaY = ((int) mov.getY());
-							Point2D.Double adjust = this.adjustDirection(par);
 
 							if (par.getLocate() == 0) {
 								andaX *= -1;
 								andaY *= -1;
 							}
-
-							andaX += adjust.x;
-							andaY += adjust.y;
-							//par.setDebug("" + par.getLocate());
+							// par.setDebug("" + par.getLocate());
 							nova = new particle(par.getX() + andaX, par.getY() + andaY, par.getType(), par.getImage(), par.getDistCentro());
-							
+
 						} catch (NullPointerException e) {
 							nova = par;
 						}
@@ -138,6 +174,11 @@ public class position implements Observer {
 
 						} // Caso nao existam colis›es faz movimento
 							// normal
+						
+						nova.setX(nova.getX() + (int)adjust.x);
+						nova.setY(nova.getY() + (int)adjust.y);
+						par.setDebug("x: " + (int) adjust.x + " y: " + (int) adjust.y );
+
 						par.setX(nova.getX());
 						par.setY(nova.getY());
 
@@ -150,17 +191,17 @@ public class position implements Observer {
 							// Para verificar se j‡ mudou tudo
 							// Outra fun‹o troca o locate
 						}
-					}
+					} 
 				}
 			}
 		}
 	}
 
 	// Metodo para dar mais peso a um movimento
-	public Point2D.Double adjustDirection(particle par) {
+	public Point2D.Double adjustDirection(particle par,movTabuleiro mov) {
 		// Neste primeiro caso so para as flores porque
 		// Para dentro elas sabem andar direito
-		Point2D.Double valor = new Point2D.Double(0,0);
+		Point2D.Double valor = new Point2D.Double(0, 0);
 		if (this.flowers.size() > 0) {
 			if (par.getLocate() == 0) {
 				flower closeFlower = this.getShortFlower(par);
@@ -178,7 +219,7 @@ public class position implements Observer {
 						dif = difX / difY;
 
 						// Aqui multi a dif pelo valor que tenho que andar no X
-						valor.x = dif % 5;
+						valor.x = dif % 10;
 						valor.y = 0;
 
 						// Tenho que decidir que valor tenho que dar ao
@@ -187,15 +228,16 @@ public class position implements Observer {
 						if (closeFlower.getX() < par.getX()) {
 							valor.x *= -1;
 						}
+						
 					} else {
 						dif = difY / difX;
 						valor.x = 0;
-						valor.y = dif % 5;
+						valor.y = dif % 10;
 						if (closeFlower.getY() < par.getY()) {
 							valor.y *= -1;
 						}
-					}
 
+					}
 				}
 			}
 		}
@@ -247,7 +289,6 @@ public class position implements Observer {
 	}
 
 	// Verifica colisoes
-
 	public boolean verifyCollision(particle e) {
 		// the same size on two hashmap
 		if (this.array.size() == 0) {
@@ -267,7 +308,6 @@ public class position implements Observer {
 	}
 
 	// MŽtodo para saber se se vai subrepor
-
 	public problema subposition(particle e, particle original) {
 		problema problema = new problema();
 
@@ -296,7 +336,6 @@ public class position implements Observer {
 	}
 
 	// Calcula quem tem conhecimento das flores com uma tolerancia
-
 	public void findFlower() {
 		ArrayList<particle> flores = new ArrayList<particle>();
 
@@ -319,7 +358,6 @@ public class position implements Observer {
 	}
 
 	// Calcula se a particula ja foi visitar a flor que tem
-
 	public boolean verifyDestination(particle part) {
 
 		int find = -1;

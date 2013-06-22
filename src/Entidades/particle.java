@@ -1,14 +1,6 @@
 package Entidades;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
+
 import java.util.ArrayList;
 
 public class particle {
@@ -63,7 +55,7 @@ public class particle {
 	public boolean getProximity(flower part) {
 		int aux_X = this.x - part.getX();
 		int aux_Y = this.y - part.getY();
-		int tolerancia = 50;
+		int tolerancia = 10;
 		if (Math.abs(aux_X) < tolerancia && Math.abs(aux_Y) < tolerancia) {
 			return true;
 		}
@@ -75,7 +67,7 @@ public class particle {
 		public boolean getProximity(particle part) {
 			int aux_X = this.x - part.getX();
 			int aux_Y = this.y - part.getY();
-			int tolerancia = 50;
+			int tolerancia = 10;
 			if (Math.abs(aux_X) < tolerancia && Math.abs(aux_Y) < tolerancia) {
 				return true;
 			}
@@ -189,7 +181,6 @@ public class particle {
 
 	// Quem sabe quarda a informa‹o num ficheiro
 	public void saveFlower() {
-		ArrayList<flower> flores = updateFlower();
 		/**
 		// Acrescenta as flores guardados por outras a lista
 		if (flores != null) {

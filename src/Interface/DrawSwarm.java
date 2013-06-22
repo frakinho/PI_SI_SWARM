@@ -1,6 +1,7 @@
 package Interface;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -14,6 +15,7 @@ import javax.swing.JPanel;
 import config.config;
 
 import Entidades.flower;
+import Entidades.movTabuleiro;
 import Entidades.particle;
 import Entidades.position;
 
@@ -34,8 +36,8 @@ public class DrawSwarm extends JPanel {
 
 	public void paint(Graphics g) {
 		super.paintComponent(g);
-		g.setColor(Color.BLACK);
 		g.setColor(Color.RED);
+		g.drawRect(0, 0, p.getConfig().getWidth(), p.getConfig().getHeigth());
 
 		BufferedImage beeNormal = null;
 		BufferedImage home = null;
@@ -51,6 +53,24 @@ public class DrawSwarm extends JPanel {
 		}
 
 		ArrayList<particle> array = this.p.getArray();
+		int passo = this.p.getConfig().getWidth() / this.p.getConfig().getNrParticoes();
+		int i = 0;
+		int j = 0;
+		// procura por a chave do i
+		g.setColor(Color.BLUE);
+		g.setFont(new Font("Arial", 1, 9));
+		for (; i < p.getConfig().getWidth(); i += passo) {
+
+			for (j = 0; j < p.getConfig().getWidth(); j += passo) {
+				movTabuleiro mov = this.p.getConfig().getValores().get(i+"-"+j);
+				g.drawString("x: " + (int) mov.getX() + " y: " + (int)mov.getY(), i, j);
+				if(mov.getX() == 0 || mov.getY() == 0) {
+					g.drawRect(i, j, passo, passo);
+				}
+			}
+		}
+		
+		g.drawRect(400, 400, 1, 1);
 
 		for (particle part : array) {
 			if (part.getType() == 1) {
@@ -58,17 +78,20 @@ public class DrawSwarm extends JPanel {
 
 			} else {
 				flower florPorx = this.getShortFlower(part);
-				g.drawLine(part.getX(), part.getY(),
-				florPorx.getX(),florPorx.getY());
+				if (this.p.getConfig().getDebug() == 1) {
+					g.drawLine(part.getX(), part.getY(), florPorx.getX(), florPorx.getY());
+					g.drawString("" + part.getDebug(), part.getX(), part.getY());
+				}
 				g.drawImage(beeNormal, part.getX(), part.getY(), null);
-				g.drawString("" + part.getDebug(), part.getX(), part.getY());
 			}
 		}
 
 		for (flower flor : this.p.getFlowers()) {
 			g.drawImage(flower, flor.getX(), flor.getY(), null);
-			g.drawRect(flor.getX(), flor.getY(),1, 1);
-			//g.drawRect(flor.getX() - 50, flor.getY() - 50, 100, 100);
+			if (this.p.getConfig().getDebug() == 1) {
+				g.drawRect(flor.getX(), flor.getY(), 1, 1);
+			}
+			// g.drawRect(flor.getX() - 50, flor.getY() - 50, 100, 100);
 		}
 		this.p.moviment();
 
