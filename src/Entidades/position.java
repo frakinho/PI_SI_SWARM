@@ -117,8 +117,8 @@ public class position implements Observer {
 								andaY *= -1;
 							}
 
-							//andaX += adjust.x;
-							//andaY += adjust.y;
+							andaX += adjust.x;
+							andaY += adjust.y;
 							//par.setDebug("" + par.getLocate());
 							nova = new particle(par.getX() + andaX, par.getY() + andaY, par.getType(), par.getImage(), par.getDistCentro());
 							
@@ -160,7 +160,7 @@ public class position implements Observer {
 	public Point2D.Double adjustDirection(particle par) {
 		// Neste primeiro caso so para as flores porque
 		// Para dentro elas sabem andar direito
-		Point2D.Double valor = new Point2D.Double(1, 1);
+		Point2D.Double valor = new Point2D.Double(0,0);
 		if (this.flowers.size() > 0) {
 			if (par.getLocate() == 0) {
 				flower closeFlower = this.getShortFlower(par);

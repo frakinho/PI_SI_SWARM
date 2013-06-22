@@ -150,6 +150,7 @@ public class Swarm {
 		JLabel lblNmeroDeFlores = new JLabel("N\u00FAmero de Flores");
 		
 		JSpinner spinner_1 = new JSpinner();
+		
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.TRAILING)

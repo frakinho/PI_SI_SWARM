@@ -190,7 +190,7 @@ public class particle {
 	// Quem sabe quarda a informação num ficheiro
 	public void saveFlower() {
 		ArrayList<flower> flores = updateFlower();
-
+		/**
 		// Acrescenta as flores guardados por outras a lista
 		if (flores != null) {
 			for (flower par : flores) {
@@ -216,7 +216,7 @@ public class particle {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 
 	}
 
@@ -227,7 +227,7 @@ public class particle {
 	}
 
 	public ArrayList<flower> updateFlower() {
-		try {
+		/*try {
 			// FileInputStream fis = new FileInputStream("flores.dat");
 			// ObjectInputStream ois = new ObjectInputStream(fis);
 			// ArrayList<flower> flores = (ArrayList<flower>) ois.readObject();
@@ -244,7 +244,7 @@ public class particle {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		return null;
 
 	}
